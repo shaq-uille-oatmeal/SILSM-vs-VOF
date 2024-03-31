@@ -21,8 +21,10 @@ cs = PchipInterpolator(ts,hs)
 hs_int = cs(t)
 pl.plot(t,h,color='green')
 pl.plot(t,hs_int,color='blue')
+pl.xlabel("Non-dimensional Time")
+pl.ylabel("Non-dimensional Height")
 pl.legend(["interFlow","SI-LSM"])
-pl.savefig("DropletCoalescence.png")
+pl.savefig('DropletCoalescence.eps', format='eps')
 pl.show()
 	
 
