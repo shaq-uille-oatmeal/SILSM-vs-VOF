@@ -1,0 +1,106 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v2306                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    object      alpha.water;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+dimensions      [0 0 0 0 0 0 0];
+
+internalField   #codeStream 
+{
+        codeInclude
+        #{
+            #include "fvCFD.H"
+        #};
+        
+        codeOptions
+        #{
+            -I$(LIB_SRC)/finiteVolume/lnInclude \
+            -I$(LIB_SRC)/meshTools/lnInclude
+        #};
+        
+        codeLibs
+        #{
+            -lmeshTools \
+            -lfiniteVolume
+        #};
+       
+        code
+        #{
+            const IOdictionary& d = static_cast<const IOdictionary&>(dict);
+            const fvMesh& mesh = refCast<const fvMesh>(d.db());
+           
+            scalarField alpha(mesh.nCells(), 0.);
+           
+            forAll(alpha, i) 
+            {
+
+                const scalar x = mesh.C()[i][0];
+                const scalar y = mesh.C()[i][1];
+		scalar N = 32;
+		scalar dx = 1/N;
+		scalar dy = 1/N;
+		
+		scalar pi = constant::mathematical::pi;
+		
+                if (
+                	(y + dy/2) < (0.5 - 0.01*cos(2*pi*x)) 
+                   )
+                {
+                	alpha[i] = 1.;
+                }
+                
+                else if (
+                	(y - dy/2) > (0.5 - 0.01*cos(2*pi*x))
+                	)
+                {	
+                	alpha[i] = 0;
+                }
+                else {
+                	alpha[i] = 0.5/dy - y/dy + 0.5 - 0.01*cos(2*pi*x)*sin(pi*dx)/pi/dx/dy;
+		}
+            }
+            alpha.writeEntry("", os);;
+        #};
+
+};
+
+boundaryField
+{
+    leftWall
+    {
+        type            cyclic;
+    }
+
+    rightWall
+    {
+        type            cyclic;
+    }
+
+    lowerWall
+    {
+        type            zeroGradient;
+    }
+
+    atmosphere
+    {
+        type            zeroGradient;
+    }
+
+    defaultFaces
+    {
+        type            empty;
+    }
+}
+
+// ************************************************************************* //
