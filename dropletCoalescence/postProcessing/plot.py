@@ -24,7 +24,7 @@ pl.plot(t,hs_int,color='blue')
 pl.xlabel("Non-dimensional Time")
 pl.ylabel("Non-dimensional Height")
 pl.legend(["interFlow","SI-LSM"])
-pl.savefig('DropletCoalescence.eps', format='eps')
+pl.savefig('DropletCoalescence.png',dpi=1200)
 pl.show()
 	
 
